@@ -1,13 +1,28 @@
 import requests
 
-def generate_story_from_ollama(category: str, sentiment: str) -> str:
+def generate_story_from_ollama(
+        character_name: str,
+        theme: str,
+        mood: str,
+        length_minutes: int,
+        language: str,
+        description: str,
+) -> str:
+    target_words = length_minutes * 100
     prompt_text = (
-        f"Write a simple children's story about {category} with a {sentiment} mood."
-        "Strict rules: "
-        "1. Only use CEFR A1 English Beginner Vocabulary"
-        "2. Keep sentences short and simple"
-        "3. Maximum 3 shor paragraphs"
-        "4. Do not use complex words"
+        "System: You are an expert children's book author specializing in stories for toddlers (ages 2-4). "
+        "Strictly follow these rules:\n"
+        "1. Only use CEFR A1 English Beginner Vocabulary and simple grammar (mostly present tense).\n"
+        "2. Keep sentences short and simple and use gentle word repetition.\n"
+        "3. Keep the conflict very mild and strictly avoid any scary or complex themes.\n"
+        "4. Output ONLY the story text, with no titles or conversational filler.\n\n"
+        f"User: Please write a story using the following specifications:\n"
+        f"- Main Character Name: {character_name}\n"
+        f"- Theme: {theme}\n"
+        f"- Mood/Tone: {mood}\n"
+        f"- Language: {language}\n"
+        f"- Length: closely around {target_words} words\n\n"
+        f"Story Concept:\n\"{description}\""
     )
     payload = {
         "model": "qwen:0.5b",
