@@ -5,10 +5,19 @@ AUDIO_DIR = "audio_output"
 if not os.path.exists(AUDIO_DIR):
     os.makedirs(AUDIO_DIR)
 
-async def convert_text_to_audio(text: str, filename: str) -> str:
+VOICE_MAPPING = {
+    "Warm": "en-US-JennyNeural", 
+    "Brave": "en-US-ChristopherNeural",
+    "Gentle": "en-US-AriaNeural",
+    "Character": "en-US-EricNeural",
+    "Friendly": "en-US-GuyNeural",
+    "Neutral": "en-US-SteffanNeural"
+}
+
+async def convert_text_to_audio(text: str, voice_tone: str, filename: str) -> str:
     file_path = os.path.join(AUDIO_DIR, filename)
 
-    voice = "en-US-AriaNeural"  # You can change the voice as needed
+    voice = VOICE_MAPPING.get(voice_tone, "en-US-AriaNeural")
 
     communicate = edge_tts.Communicate(text, voice)
     await communicate.save(file_path)

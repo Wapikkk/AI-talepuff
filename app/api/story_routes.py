@@ -9,18 +9,19 @@ router = APIRouter()
 @router.post("/generate_story")
 async def generate_story(req: StoryRequest):
     try:
-        story_text = generate_story_from_ollama(req.category, req.sentiment)
-
-        file_name = f"story_{int(time.time())}.mp3"
-
-        await convert_text_to_audio(story_text, file_name)
-
-        audio_url = f"http://localhost:8000/audio/{file_name}"
+        target_words = req.length_minutes * 120
+        story_text = generate_story_from_ollama(
+            character_name=req.character_name,
+            theme=req.theme,
+            mood=req.mood,
+            length_minutes=req.length_minutes,
+            language=req.language,
+            description=req.description
+        )
 
         return {
             "status": "success",
-            "story": story_text, 
-            "audio_url": audio_url
+            "response": story_text,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
