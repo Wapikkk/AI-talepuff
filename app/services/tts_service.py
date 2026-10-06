@@ -1,7 +1,6 @@
 import edge_tts
 import os
-import io
-from pydub import AudioSegment
+import subprocess
 
 AUDIO_DIR = "audio_output"
 if not os.path.exists(AUDIO_DIR):
@@ -17,24 +16,30 @@ VOICE_MAPPING = {
 }
 
 async def convert_text_to_audio(text: str, voice_tone: str, filename: str) -> str:
-    final_filename = filename.replace('.mp3', '.wav')
-    file_path = os.path.join(AUDIO_DIR, final_filename)
+    wav_filename = filename.replace('.mp3', '.wav')
+    wav_path = os.path.join(AUDIO_DIR, wav_filename)
+    mp3_path = os.path.join(AUDIO_DIR, filename)
 
     voice = VOICE_MAPPING.get(voice_tone, "en-US-JennyNeural")
 
     communicate = edge_tts.Communicate(text, voice)
+    await communicate.save(mp3_path)
 
-    mp3_memory = io.BytesIO()
+    command = [
+        "ffmpeg", "-y", "-i", mp3_path,
+        "-ac", "1", "-ar", "24000", wav_path
+    ]
 
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            mp3_memory.write(chunk["data"])
+    try:
+        subprocess.run(command, check=True, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print(f"Error converting MP3 to WAV: {e}")
+        raise
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise
+    finally:
+        if os.path.exists(mp3_path):
+            os.remove(mp3_path)
 
-    mp3_memory.seek(0)
-
-    audio = AudioSegment.from_file(mp3_memory, format="mp3")
-    audio = audio.set_channels(1).set_frame_rate(24000)
-
-    audio.export(file_path, format="wav")
-
-    return file_path
+    return wav_path
