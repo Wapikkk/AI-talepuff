@@ -15,7 +15,10 @@ def generate_story_from_ollama(
         "1. Only use CEFR A1 English Beginner Vocabulary and simple grammar (mostly present tense).\n"
         "2. Keep sentences short and simple and use gentle word repetition.\n"
         "3. Keep the conflict very mild and strictly avoid any scary or complex themes.\n"
-        "4. Output ONLY the story text, with no titles or conversational filler.\n\n"
+        "4. You MUST output the response in this EXACT format:\n"
+        "TITLE: [Write the story title here]\n"
+        "CONTENT: [Write the story text here]\n"
+        "Do not include any conversational filler.\n\n"
         f"User: Please write a story using the following specifications:\n"
         f"- Main Character Name: {character_name}\n"
         f"- Theme: {theme}\n"
@@ -36,4 +39,14 @@ def generate_story_from_ollama(
 
     response = requests.post("http://localhost:11434/api/generate", json=payload)
     response.raise_for_status()
-    return response.json().get("response", "")
+    raw_output = response.json().get("response", "")
+    
+    title = f"{character_name}'s Adventure"
+    content = raw_output
+    
+    if "TITLE:" in raw_output and "CONTENT:" in raw_output:
+        parts = raw_output.split("CONTENT:")
+        title = parts[0].replace("TITLE:", "").strip()
+        content = parts[1].strip()
+        
+    return title, content
