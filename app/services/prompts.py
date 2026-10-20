@@ -1,5 +1,3 @@
-"""Teks prompt untuk generate cerita. Data murni + pembangun string, tanpa I/O."""
-
 DEFAULT_IDEA = "Your choice, keep it simple and cozy."
 
 STORY_RULES = (
@@ -17,7 +15,6 @@ STORY_RULES = (
 
 
 def idea_block(idea: str) -> str:
-    """Ide pengguna dibungkus tag agar model memperlakukannya sebagai data, bukan perintah."""
     return f"<idea>{idea}</idea>" if idea else DEFAULT_IDEA
 
 
