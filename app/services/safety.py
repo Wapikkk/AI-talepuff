@@ -1,6 +1,7 @@
 import re
 
 MAX_NAME_CHARS = 30
+MAX_LABEL_CHARS = 60
 MAX_DESCRIPTION_WORDS = 30
 
 _BANNED_ENGLISH = [
@@ -32,11 +33,11 @@ _INJECTION_RE = re.compile(
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")
 _NAME_ALLOWED = re.compile(r"^[A-Za-z][A-Za-z' \-]*$")
+_LABEL_ALLOWED = re.compile(r"^[A-Za-z][A-Za-z ,\-]*$")
 _PII_RE = re.compile(r"\b\d{6,}\b")
 
 
 def find_banned_terms(text: str) -> list[str]:
-    """Daftar kata terlarang yang ditemukan di `text` (huruf kecil, tanpa duplikat)."""
     return sorted({m.group(0).lower() for m in _BANNED_RE.finditer(text)})
 
 
@@ -45,12 +46,10 @@ def looks_like_injection(text: str) -> bool:
 
 
 def contains_pii(text: str) -> bool:
-    """Deteksi kasar: deretan angka panjang (nomor telepon, dsb.)."""
     return bool(_PII_RE.search(text))
 
 
 def clean_text(text: str) -> str:
-    """Buang karakter kontrol dan rapikan spasi."""
     return " ".join(_CONTROL_CHARS.sub(" ", text).split())
 
 
@@ -59,7 +58,6 @@ def truncate_words(text: str, max_words: int) -> str:
 
 
 def is_valid_name(name: str) -> bool:
-    """Nama karakter: huruf, spasi, apostrof, tanda hubung; panjang terbatas."""
     return (
         0 < len(name) <= MAX_NAME_CHARS
         and bool(_NAME_ALLOWED.match(name))
@@ -67,6 +65,15 @@ def is_valid_name(name: str) -> bool:
     )
 
 
+def is_valid_label(text: str) -> bool:
+   
+    return (
+        0 < len(text) <= MAX_LABEL_CHARS
+        and bool(_LABEL_ALLOWED.match(text))
+        and not find_banned_terms(text)
+        and not looks_like_injection(text)
+    )
+
+
 def is_safe_idea(text: str) -> bool:
-    """Apakah deskripsi bebas aman dimasukkan ke prompt apa adanya."""
     return not (find_banned_terms(text) or looks_like_injection(text) or contains_pii(text))
