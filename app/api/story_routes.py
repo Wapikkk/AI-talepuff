@@ -22,7 +22,6 @@ async def generate_story(
         story = await generator.generate(req)
     except StoryGenerationError as exc:
         logger.error("story generation failed: %s flags=%s", exc, exc.flags)
-        # Detail internal tidak dikirim ke klien.
         raise HTTPException(status_code=502, detail="Story generation failed") from exc
 
     return StoryResponse(

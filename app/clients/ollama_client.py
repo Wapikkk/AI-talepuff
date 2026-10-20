@@ -1,4 +1,3 @@
-"""Klien Ollama (asinkron) yang memenuhi antarmuka LLMClient."""
 import re
 
 import httpx
@@ -6,12 +5,10 @@ import httpx
 from app.clients.llm_client import GenerationParams, LLMError, LLMResponse
 
 _NS = 1e9
-# Memuat model dari disk ke GPU bisa memakan waktu; batasnya lebih longgar dari request biasa.
 WARMUP_TIMEOUT_SECONDS = 120.0
 
 
 def _keep_alive_value(raw: str) -> int | str:
-    """Ollama menerima angka (detik) atau string berunit ("30m"); string tanpa unit ditolak."""
     return int(raw) if re.fullmatch(r"-?\d+", raw) else raw
 
 
@@ -25,8 +22,6 @@ class OllamaClient:
         think: bool | None = False,
         keep_alive: str | None = None,
     ) -> None:
-        """`http` sudah berisi base_url dan timeout. `think=None` = jangan kirim parameternya
-        (model tanpa mode thinking, mis. qwen:0.5b, menolak parameter itu)."""
         self._http = http
         self._model = model
         self._context_window = context_window
@@ -35,7 +30,6 @@ class OllamaClient:
         self._keep_alive = keep_alive
 
     async def warm_up(self) -> None:
-        """Muat model ke memori sebelum request pertama (`messages` kosong = hanya memuat)."""
         payload: dict = {"model": self._model, "messages": [], "stream": False}
         if self._keep_alive is not None:
             payload["keep_alive"] = _keep_alive_value(self._keep_alive)

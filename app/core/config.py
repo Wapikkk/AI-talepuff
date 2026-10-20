@@ -1,16 +1,9 @@
-"""Konfigurasi aplikasi dari environment variable.
-
-Dibaca sekali saat startup. Nilai tidak valid menghentikan aplikasi dengan
-pesan jelas (fail fast), bukan gagal diam-diam saat request pertama.
-Jalankan dengan `uvicorn app.main:app --env-file .env` agar `.env` ikut terbaca.
-"""
 import os
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 
 SUPPORTED_PROVIDERS = ("ollama",)
-# Durasi Ollama: angka detik ("300", "-1" = selamanya) atau dengan satuan ("30m", "1h").
 _KEEP_ALIVE_RE = re.compile(r"^-?\d+[smh]?$")
 
 
@@ -19,12 +12,10 @@ class Settings:
     llm_provider: str = "ollama"
     ollama_url: str = "http://localhost:11434"
     ollama_model: str = "qwen3:4b"
-    # Berapa lama Ollama menahan model di memori setelah request terakhir (bawaan Ollama: 5m).
     ollama_keep_alive: str = "30m"
     llm_timeout_seconds: float = 180.0
     llm_context_window: int = 4096
     llm_max_output_tokens: int = 4096
-    # Kecepatan baca TTS (edge-tts Jenny/Christopher terukur 109-131 kata/menit).
     words_per_minute: int = 120
     max_attempts: int = 3
 
