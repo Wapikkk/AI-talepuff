@@ -31,6 +31,21 @@ def repair_glitches(text: str) -> tuple[str, int]:
     return re.sub(r"[ \t]{2,}", " ", text).strip(), fixed
 
 
+_QUOTE_MAP = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"'})
+
+
+def normalize_quotes(text: str) -> str:
+    return text.translate(_QUOTE_MAP)
+
+
+def repair_truncated_name(text: str, name: str) -> tuple[str, int]:
+    name = name.strip()
+    if len(name) < 2 or not name[0].isalpha():
+        return text, 0
+    pattern = re.compile(rf"(?<![\w'])({re.escape(name[0].upper())})'s\b")
+    return pattern.subn(lambda _: f"{name}'s", text)
+
+
 def find_problems(title: str, content: str) -> list[str]:
     problems: list[str] = []
     if not title or not content:
