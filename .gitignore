@@ -20,3 +20,5 @@ Thumbs.db
 
 /benchmarks/*
 /tests/*
+
+/audio_output/*
