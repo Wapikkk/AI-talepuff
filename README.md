@@ -14,6 +14,8 @@ Dokumentasi API otomatis: `http://localhost:8000/docs`.
 
 ## Konfigurasi (environment variable, semua opsional)
 
+Salin `.env.example` menjadi `.env` bila ingin mengubah bawaan (`.env` kosong pun sah). `--env-file` membutuhkan `python-dotenv`, yang sudah ada di `requirements.txt`. Panduan menjalankan seluruh sistem (Postgres, Ollama, Gin, aplikasi) ada di `docs/RUN_LOCAL.md` pada repo `talepuff_backend`; layanan ini juga membutuhkan `ffmpeg` di `PATH`.
+
 | Variabel | Default | Keterangan |
 |---|---|---|
 | `LLM_PROVIDER` | `ollama` | Penyedia LLM (saat ini hanya `ollama`) |

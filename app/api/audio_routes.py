@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.audio_scehma import AudioRequest
+from app.schemas.audio_schema import AudioRequest
 from app.services.tts_service import convert_text_to_audio
 import os
 import re
