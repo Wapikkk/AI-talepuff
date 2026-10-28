@@ -16,7 +16,7 @@ async def generate_audio(req: AudioRequest):
     try:
         file_name = f"story_{int(time.time())}_{req.voice_tone}.mp3"
 
-        saved_file_path = await convert_text_to_audio(req.story_text, req.voice_tone, file_name)
+        saved_file_path, sentences = await convert_text_to_audio(req.story_text, req.voice_tone, file_name)
 
         final_wav_name = os.path.basename(saved_file_path)
 
@@ -24,7 +24,8 @@ async def generate_audio(req: AudioRequest):
 
         return {
             "status": "success",
-            "audio_url": audio_url
+            "audio_url": audio_url,
+            "sentences": sentences,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
